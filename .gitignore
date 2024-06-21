@@ -109,7 +109,7 @@ venv.bak/
 certs/
 images/
 prototypes/
-config.env
+nfig.env
 .log
 env_variables
 test.py

@@ -3,17 +3,10 @@
     This controller manages the AMQP, serving as the RabbitMQ interface.
 
 """
-
-import base64
-import json
-
 import threading
 import logging.config
 import functools
-from uuid import UUID, uuid4
-import asyncio
-from datetime import datetime
-from asyncio import ensure_future
+
 from inspect import currentframe
 import pika
 
@@ -30,14 +23,12 @@ def get_amqp_connection():
     :return: pika Connection parameters for RabbitMQ.
     """
     log.info("Starting: %s", currentframe().f_code.co_name)
-
     credentials = pika.credentials.PlainCredentials(username=_set.qms_user,
                                                     password=_set.qms_password)
 
     conn_parameters = pika.ConnectionParameters(host=_set.qms_server,
                                                 port=_set.qms_port,
                                                 credentials=credentials)
-
     log.info("Ending: %s", currentframe().f_code.co_name)
     return pika.BlockingConnection(conn_parameters)
 
@@ -57,14 +48,14 @@ def on_message(_channel, method_frame, header_frame, body, args):
     log.info("Headers of this message: %s", header_frame)
     (_connection, _threads) = args
     t = threading.Thread(
-        target=do_work, args=(_connection,
-                              _channel, method_frame.delivery_tag, body))
+        target=execute_operation, args=(_connection,
+                                        _channel, method_frame.delivery_tag, body))
     t.start()
     _threads.append(t)
     log.info("Ending: %s", currentframe().f_code.co_name)
 
 
-def do_work(connection, channel, delivery_tag, body):
+def execute_operation(connection, channel, delivery_tag, body):
     """
         this executes work on a thread and after marks ACK the message.
 

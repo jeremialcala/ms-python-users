@@ -5,7 +5,8 @@
     dto_$name represents a class use for transport data.
     tool_$name represents a class with some tooling and utilities.
 """
+# Tools
+from .tool_settings import Settings
+
 # Entities
 from .entity_users import User
-# Tools
-from tool_settings import Settings

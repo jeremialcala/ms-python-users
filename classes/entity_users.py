@@ -24,7 +24,8 @@ connect(
 
 class User(Document):
     """
-        Class that define the users as a resource, for now we are having FName, LName, Email and PhoneNumber.
+        Class that define the users as a resource, for now we are having FName,
+        LName, Email and PhoneNumber.
 
     """
     _uuid = UUIDField(required=True, unique=True, default=uuid4())
@@ -46,10 +47,9 @@ class User(Document):
         """
         user = None
         try:
-            user = list(User.objects(emailAddress=email))
-        except ValueError as e:
+            user = list(User.objects(emailAddress=email))  # pylint: disable=no-member;
+        except ValueError:
             log.error("The user with email %s was not found", email)
-            pass
 
         return user
 
@@ -63,7 +63,7 @@ class User(Document):
         """
         try:
             log.info("updating user %s to this status %s", email, Status(status).name)
-            User.objects(email_address=email).update_one(set__status=status)
+            User.objects(email_address=email).update_one(set__status=status)  # pylint: disable=no-member;
         except OperationError as e:
             log.error(e.args)
             return ResponseCodes.ERR

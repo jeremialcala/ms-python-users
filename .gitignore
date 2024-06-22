@@ -113,3 +113,4 @@ config.env
 .log
 env_variables
 test.py
+.pylintrc

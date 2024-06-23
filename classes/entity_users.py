@@ -27,15 +27,6 @@ class User(Document):
     """
         Class that define the users as a resource, for now we are having FName,
         LName, Email and PhoneNumber.
-        {
-            "firstName": fk.first_name(),
-            "middleName":fk.first_name(),
-            "lastName":fk.last_name(),
-            "emailAddress":fk.email(domain="gmail.com"),
-            "phoneNumber":fk.phone_number()
-        }
-        user["emailAddress"] = user["firstName"][0].lower() + user["lastName"].lower() + "@gmail.com"
-        {'firstName': 'Timothy', 'middleName': 'Lauren', 'lastName': 'Esparza', 'emailAddress': 'tesparza@gmail.com', 'phoneNumber': '001-476-454-1226x4204'}
 
     """
     _uuid = UUIDField(required=True, unique=True, default=uuid4())

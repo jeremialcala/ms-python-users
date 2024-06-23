@@ -112,10 +112,7 @@ def send_message_to_queue(queue: str, routing_key: str, message,
 def publish_message(queue, message, connection_parameters):
     """
         This method sends a message to a queue
-    :param queue:
-    :param message:
-    :param connection_parameters:
-    :return:
+
     """
     connection = pika.BlockingConnection(connection_parameters)
     channel = connection.channel()

@@ -10,7 +10,7 @@ from inspect import currentframe
 import pika
 from classes import Settings
 from utils import configure_logging
-
+from constants import STARTING_AT, ENDING_AT
 from .amqp import get_amqp_connection_parameters, on_message
 _set = Settings()
 
@@ -24,10 +24,8 @@ def process_messages(queue: str = _set.queue_name,
     """
         This method will open a queue and send using the AMQP controller to be processed
 
-    :param queue:
-    :param connection_parameters:
     """
-    log.info("Starting: %s", currentframe().f_code.co_name)
+    log.info(STARTING_AT, currentframe().f_code.co_name)
 
     connection = pika.BlockingConnection(connection_parameters)
     channel = connection.channel()
@@ -46,4 +44,4 @@ def process_messages(queue: str = _set.queue_name,
     for thread in threads:
         thread.join()
 
-    log.info("Ending: %s", currentframe().f_code.co_name)
+    log.info(ENDING_AT, currentframe().f_code.co_name)

@@ -10,11 +10,9 @@ from inspect import currentframe
 from functools import wraps
 
 import mongoengine.errors
-import pymongo.errors
 
 from classes import Settings, User
 from constants import STARTING_AT, ENDING_AT
-from enums import ResponseCodes
 from utils import configure_logging
 
 _set = Settings()
@@ -39,24 +37,18 @@ def user_lifecycle(func):
             TODO: Separate all operation on different methods and use match to execute here
         :return:
         """
+        log.info(STARTING_AT, currentframe().f_code.co_name)
+        body = json.loads(bytes.decode(kwargs.get("body"), "UTF-8"))
+
         try:
-            log.info(STARTING_AT, currentframe().f_code.co_name)
-
-            connection, channel, delivery_tag, body = args  # the args of a message
-
-            body = json.loads(bytes.decode(body, "UTF-8"))
-            try:
-                user = User.from_json(json.dumps(body))
-                user.save()
-                log.info(user.to_json())
-            except mongoengine.errors.OperationError as e:
-                log.error(e.args[-1])
-                pass
-
-            log.info(ENDING_AT, currentframe().f_code.co_name)
-            return func(*args, **kwargs)
-        except Exception as e:
+            user = User.from_json(json.dumps(body))
+            user.save()
+            log.info(user.to_json())
+        except mongoengine.errors.OperationError as e:
             log.error(e.args[-1])
+
+        log.info(ENDING_AT, currentframe().f_code.co_name)
+        return func(*args, **kwargs)
 
     log.info(ENDING_AT, currentframe().f_code.co_name)
     return wrapper

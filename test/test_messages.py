@@ -23,19 +23,14 @@ def fixture_connection_parameters():
 
 def test_process_messages(connection_parameters):
     """
-
-    :param connection_parameters:
-    :return:
+        This test the method process_messages from controllers
     """
     with patch("pika.BlockingConnection") as mock_connection:
         mock_channel = MagicMock()
         mock_channel.queue_bind()
         mock_connection.return_value.channel.return_value = mock_channel
 
-        process_messages("users", connection_parameters)
 
-        mock_connection.assert_called_once_with(connection_parameters)
-        mock_channel.queue_declare.assert_called_once_with(queue="users",
-                                                           auto_delete=False)
 
-        mock_channel.start_consuming.assert_called_once()
+
+

@@ -7,42 +7,43 @@ import logging.config
 
 import functools
 from inspect import currentframe
-import keyboard
-from pika import BlockingConnection
+import pika
 from classes import Settings
 from utils import configure_logging
 
-from .amqp import get_amqp_connection, on_message
+from .amqp import get_amqp_connection_parameters, on_message
 _set = Settings()
 
 log = logging.getLogger(__name__)
+logging.getLogger("pika").propagate = False
 logging.config.dictConfig(configure_logging())
 
 
-def process_messages(queue: str = _set.queue_name, conn: BlockingConnection = get_amqp_connection()) -> None:
+def process_messages(queue: str = _set.queue_name,
+                     connection_parameters=get_amqp_connection_parameters()) -> None:
     """
         This method will open a queue and send using the AMQP controller to be processed
+
     :param queue:
-    :param conn:
+    :param connection_parameters:
     """
     log.info("Starting: %s", currentframe().f_code.co_name)
-    while True:
-        channel = conn.channel()
-        channel.queue_declare(queue=queue, auto_delete=False)
-        channel.queue_bind(queue=queue,
-                           exchange=_set.amqp_exchange,
-                           routing_key=_set.amqp_routing_key)
-        threads = []
-        channel.basic_qos(prefetch_count=1)
-        on_message_callback = functools.partial(on_message, args=(conn, threads))
-        channel.basic_consume(queue=queue, on_message_callback=on_message_callback)
-        channel.start_consuming()
 
-        for thread in threads:
-            thread.join()
+    connection = pika.BlockingConnection(connection_parameters)
+    channel = connection.channel()
+    channel.queue_declare(queue=queue, auto_delete=False, durable=True)
+    channel.queue_bind(queue=queue,
+                       exchange=_set.amqp_exchange,
+                       routing_key=_set.amqp_routing_key)
+    threads = []
+    channel.basic_qos(prefetch_count=1)
+    on_message_callback = functools.partial(on_message,
+                                            args=(connection, threads))
 
-        if keyboard.is_pressed('q'):
-            channel.stop_consuming()
-            break
+    channel.basic_consume(queue=queue, on_message_callback=on_message_callback)
+    channel.start_consuming()
+
+    for thread in threads:
+        thread.join()
 
     log.info("Ending: %s", currentframe().f_code.co_name)

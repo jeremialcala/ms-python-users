@@ -38,6 +38,7 @@ PyYAML>=6.0.1
 
 # UnitTesting
 pytest>=8.1.1
+pytest-cov
 
 # QR Tools
 segno>=1.6.1

@@ -5,7 +5,6 @@
 import logging
 from datetime import datetime
 from uuid import uuid4
-
 from mongoengine import (Document, StringField, UUIDField, DateTimeField,
                          IntField, EmailField, connect, OperationError)
 
@@ -14,6 +13,8 @@ from .tool_settings import Settings
 
 settings = Settings()
 log = logging.getLogger(settings.environment)
+logging.getLogger("pymongo").propagate = False
+
 connect(
     db=settings.db_name,
     username=settings.db_username,
@@ -26,6 +27,15 @@ class User(Document):
     """
         Class that define the users as a resource, for now we are having FName,
         LName, Email and PhoneNumber.
+        {
+            "firstName": fk.first_name(),
+            "middleName":fk.first_name(),
+            "lastName":fk.last_name(),
+            "emailAddress":fk.email(domain="gmail.com"),
+            "phoneNumber":fk.phone_number()
+        }
+        user["emailAddress"] = user["firstName"][0].lower() + user["lastName"].lower() + "@gmail.com"
+        {'firstName': 'Timothy', 'middleName': 'Lauren', 'lastName': 'Esparza', 'emailAddress': 'tesparza@gmail.com', 'phoneNumber': '001-476-454-1226x4204'}
 
     """
     _uuid = UUIDField(required=True, unique=True, default=uuid4())

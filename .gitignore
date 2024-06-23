@@ -114,3 +114,4 @@ config.env
 env_variables
 test.py
 .pylintrc
+sonar-project.properties

@@ -8,5 +8,9 @@
 # Tools
 from .tool_settings import Settings
 
+# DTOs
+from .dto_user import Users
+from .dto_event import EventTransport
+
 # Entities
 from .entity_users import User
